@@ -1,0 +1,10 @@
+import { describe, expect, it, vi } from 'vitest';
+import { renderToStaticMarkup } from 'react-dom/server';
+const mocks = vi.hoisted(() => ({ reset: vi.fn(), confirm: vi.fn().mockResolvedValue(false), success: vi.fn() }));
+vi.mock('../../theme/ThemeProvider', () => ({ useTheme: () => ({ theme:'dark', setTheme:vi.fn() }) }));
+vi.mock('../../store/dashboardStore', () => ({ useDashboardStore: (selector: (state: { resetDashboard: typeof mocks.reset }) => unknown) => selector({ resetDashboard:mocks.reset }) }));
+vi.mock('../../lib/feedback', () => ({ confirmDestructiveAction:mocks.confirm, showSuccess:mocks.success }));
+vi.mock('../../theme/ThemeBuilder', () => ({ ThemeBuilder: () => <div>Theme Builder</div> }));
+vi.mock('../layouts/LayoutManager', () => ({ LayoutManager: () => <div>Layouts</div> }));
+import { DashboardHeader } from './DashboardHeader';
+describe('DashboardHeader', () => { it('renders dashboard controls', () => { const html=renderToStaticMarkup(<DashboardHeader/>); expect(html).toContain('Portfolio Decision Workbench'); expect(html).toContain('Reset workspace'); expect(html).toContain('Select dashboard theme'); }); });
